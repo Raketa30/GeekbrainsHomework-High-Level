@@ -1,19 +1,28 @@
 package ru.geekbrains.lesson2.server;
 
 import ru.geekbrains.lesson2.server.service.AuthService;
+import ru.geekbrains.lesson2.server.service.ChatUsersRepository;
+import ru.geekbrains.lesson2.server.service.RegistrationService;
 
 public class MessageTransmitter {
-    private final AuthService authService = new AuthService();
+    private final RegistrationService registrationService;
+    private final AuthService authService;
     private final Router router;
     private final Sender sender;
 
-    public MessageTransmitter() {
+    public MessageTransmitter(ChatUsersRepository repository) {
+        registrationService = new RegistrationService(repository);
+        authService = new AuthService(repository);
         this.sender = new ServerSender();
         this.router = new ServerRouter(authService, sender);
     }
 
     public AuthService getAuthService() {
         return authService;
+    }
+
+    public RegistrationService getRegistrationService() {
+        return registrationService;
     }
 
     public void unicast(ClientHandler clientHandler, String nickname, String formedMessage) {

@@ -1,6 +1,7 @@
 package ru.geekbrains.lesson2.server;
 
 import ru.geekbrains.lesson2.server.exceptions.ChatServerException;
+import ru.geekbrains.lesson2.server.service.ChatUsersRepository;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -8,7 +9,8 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class ChatServer {
-    private final MessageTransmitter messageTransmitter = new MessageTransmitter();
+    private final ChatUsersRepository usersRepository = new ChatUsersRepository();
+    private final MessageTransmitter messageTransmitter = new MessageTransmitter(usersRepository);
 
     public ChatServer() {
         try {

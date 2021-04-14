@@ -7,6 +7,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * 1. Разобраться с кодом
@@ -70,21 +72,19 @@ public class ClientHandler implements Runnable {
     }
 
     private void getAuthTimer() {
-        long start = System.currentTimeMillis();
-
-        new Thread(() -> {
-            while (true) {
-                try {
-                    long current = System.currentTimeMillis();
-                    if (current - start >= 120000 && getUser() == null) {
-                        out.writeUTF("Auth timeout");
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (user == null) {
+                    try {
                         socket.close();
-                        break;
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                } catch (IOException ignored) {
                 }
             }
-        }).start();
+        }, 120000);
     }
 
 }

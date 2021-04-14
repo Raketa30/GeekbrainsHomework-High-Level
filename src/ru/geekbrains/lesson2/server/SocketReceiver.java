@@ -36,7 +36,16 @@ public class SocketReceiver implements Receiver {
                     messageTransmitter.getAuthService().unscribe(clientHandler);
                     break;
 
-                } else {
+                } else if (message.startsWith("/change")) {
+                    String oldNickname = clientHandler.getUser().getNickname();
+                    String currentNickname = takeUserNicknameFromMessage(message);
+
+                    clientHandler.getUser().setNickname(currentNickname);
+                    messageTransmitter.getAuthService().changeUserNickname(clientHandler.getUser());
+                    messageTransmitter.broadcast(oldNickname + " changed nickname to " + currentNickname);
+                }
+
+                else {
                     System.out.println(message);
                     messageTransmitter.broadcast(clientHandler, message);
                 }
@@ -68,4 +77,6 @@ public class SocketReceiver implements Receiver {
         }
         return builder.toString();
     }
+
+
 }

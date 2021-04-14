@@ -9,16 +9,25 @@ import java.util.Optional;
 import java.util.Set;
 
 public class AuthService {
-    private final ChatUsersDatabase chatUsersDatabase = new ChatUsersDatabase();
+    private ChatUsersRepository chatUsersRepository;
     private final Set<ClientHandler> loggedUser = new HashSet<>();
 
+    public AuthService(ChatUsersRepository chatUsersRepository) {
+        this.chatUsersRepository = chatUsersRepository;
+    }
+
     public synchronized Optional<User> findByLoginAndPassword(String login, String password) {
-        return chatUsersDatabase.getUserSet()
+        return chatUsersRepository.findAll()
                 .stream()
                 .filter(user -> user.getLogin().equals(login)
                         && user.getPassword().equals(password))
                 .findFirst();
+    }
 
+    public void changeUserNickname(User user) {
+        if(isLoggedIn(user)) {
+            chatUsersRepository.updateUserNickname(user);
+        }
     }
 
     public synchronized void subscribe(ClientHandler handler) {
