@@ -69,6 +69,7 @@ public class AuthService {
                     subscribe(clientHandler);
 
                     transmitter.sendStatusMessage(clientHandler, "Connected to main chat");
+                    transmitter.sendStatusMessage(clientHandler, "For change nickname enter: /change new_nickname");
                     return true;
 
                 } else {
