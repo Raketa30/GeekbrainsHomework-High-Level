@@ -20,6 +20,7 @@ public class InputTextPanel extends JPanel {
 
         chatArea.append("Connected to chat server..\n");
         chatArea.append("Please enter auth message: -auth login password\n");
+        chatArea.append("For registration enter: -register nickname login password\n");
 
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(490, 40));

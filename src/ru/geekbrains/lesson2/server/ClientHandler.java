@@ -64,9 +64,17 @@ public class ClientHandler implements Runnable {
         boolean isLoggedIn = false;
 
         while (!isLoggedIn) {
-            String authMessage = in.readUTF();
-            isLoggedIn = messageTransmitter.getAuthService()
-                    .authentication(this, authMessage);
+            String inputMessage = in.readUTF();
+
+            if (inputMessage.startsWith("-register")) {
+                if (messageTransmitter.getRegistrationService().registration(inputMessage)) {
+                    messageTransmitter.sendStatusMessage(this, "Successfully registered, please auth");
+                }
+            } else {
+                isLoggedIn = messageTransmitter.getAuthService()
+                        .authentication(this, inputMessage);
+            }
+
         }
         out.writeUTF("logged");
     }

@@ -37,7 +37,7 @@ public class MessageTransmitter {
         router.broadcast(message);
     }
 
-    public void sendStatusMessage(ClientHandler clientHandler, String current_user_not_logged_on) {
-        sender.sendStatusMessage(clientHandler, current_user_not_logged_on);
+    public void sendStatusMessage(ClientHandler clientHandler, String currentUserNotLoggedOn) {
+        sender.sendStatusMessage(clientHandler, currentUserNotLoggedOn);
     }
 }
