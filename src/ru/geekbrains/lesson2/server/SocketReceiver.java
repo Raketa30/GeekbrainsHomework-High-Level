@@ -22,30 +22,16 @@ public class SocketReceiver implements Receiver {
             try {
                 String message = in.readUTF();
                 if (message.startsWith("/w ")) {
-                    if (checkUser(message)) {
-                        String nickname = takeUserNicknameFromMessage(message);
-                        String formedMessage = formPersonalMessage(message);
-
-                        messageTransmitter.unicast(clientHandler, nickname, formedMessage);
-
-                    } else {
-                        messageTransmitter.sendStatusMessage(clientHandler, "Current user not logged on");
-                    }
+                    sendPrivateMessage(message);
 
                 } else if (message.equals("-quit")) {
                     messageTransmitter.getAuthService().unscribe(clientHandler);
                     break;
 
                 } else if (message.startsWith("/change")) {
-                    String oldNickname = clientHandler.getUser().getNickname();
-                    String currentNickname = takeUserNicknameFromMessage(message);
+                    changeUserNickname(message);
 
-                    clientHandler.getUser().setNickname(currentNickname);
-                    messageTransmitter.getAuthService().changeUserNickname(clientHandler.getUser());
-                    messageTransmitter.broadcast(oldNickname + " changed nickname to " + currentNickname);
-                }
-
-                else {
+                } else {
                     System.out.println(message);
                     messageTransmitter.broadcast(clientHandler, message);
                 }
@@ -56,6 +42,27 @@ public class SocketReceiver implements Receiver {
             }
         }
 
+    }
+
+    private void changeUserNickname(String message) {
+        String oldNickname = clientHandler.getUser().getNickname();
+        String currentNickname = takeUserNicknameFromMessage(message);
+
+        clientHandler.getUser().setNickname(currentNickname);
+        messageTransmitter.getAuthService().changeUserNickname(clientHandler.getUser());
+        messageTransmitter.broadcast(oldNickname + " changed nickname to " + currentNickname);
+    }
+
+    private void sendPrivateMessage(String message) {
+        if (checkUser(message)) {
+            String nickname = takeUserNicknameFromMessage(message);
+            String formedMessage = formPersonalMessage(message);
+
+            messageTransmitter.unicast(clientHandler, nickname, formedMessage);
+
+        } else {
+            messageTransmitter.sendStatusMessage(clientHandler, "Current user not logged on");
+        }
     }
 
     private boolean checkUser(String message) {
