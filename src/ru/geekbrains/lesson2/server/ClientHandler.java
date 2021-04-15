@@ -17,21 +17,17 @@ import java.util.TimerTask;
  */
 
 public class ClientHandler implements Runnable {
-    private Socket socket;
-    private final MessageTransmitter messageTransmitter;
     private final DataOutputStream out;
     private final DataInputStream in;
-    private volatile User user;
+    private final SocketReceiver receiver;
+    private User user;
 
     public ClientHandler(Socket socket, MessageTransmitter messageTransmitter) {
-        this.socket = socket;
-        this.messageTransmitter = messageTransmitter;
-
         try {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
-            getAuthTimer();
-            authentication();
+            receiver = new SocketReceiver(messageTransmitter, this);
+            getAuthTimer(socket);
 
         } catch (IOException e) {
             throw new ChatServerException("ClientHandler closed");
@@ -40,48 +36,18 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        Receiver receiver = new SocketReceiver(in, messageTransmitter, this);
         receiver.receiveMessage();
     }
 
-    public MessageTransmitter getMessageTransmitter() {
-        return messageTransmitter;
+    public String readData() throws IOException {
+        return in.readUTF();
     }
 
-    public DataOutputStream getOut() {
-        return out;
+    public void sendData(String data) throws IOException {
+        out.writeUTF(data);
     }
 
-    public synchronized User getUser() {
-        return user;
-    }
-
-    public synchronized void setUser(User user) {
-        this.user = user;
-    }
-
-    private void authentication() throws IOException {
-        boolean isLoggedIn = false;
-
-        while (!isLoggedIn) {
-            String inputMessage = in.readUTF();
-//
-//            if (inputMessage.startsWith("-register")) {
-//                if (messageTransmitter.getRegistrationService().registration(inputMessage)) {
-//                    messageTransmitter.sendStatusMessage(this, "Successfully registered, please auth");
-//                }
-//            } else {
-//
-//            }
-
-            isLoggedIn = messageTransmitter.getAuthService()
-                    .authentication(this, inputMessage);
-
-        }
-        out.writeUTF("logged");
-    }
-
-    private void getAuthTimer() {
+    private void getAuthTimer(Socket socket) {
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -97,4 +63,11 @@ public class ClientHandler implements Runnable {
         }, 120000);
     }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
+    }
 }

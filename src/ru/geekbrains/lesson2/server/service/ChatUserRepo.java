@@ -8,8 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-public class ChatUsersRepository {
+public class ChatUserRepo {
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
         try {
@@ -30,6 +31,19 @@ public class ChatUsersRepository {
         }
 
         return users;
+    }
+
+    public boolean findUserByLogin(String login) {
+        return findAll().stream()
+                .anyMatch(user -> user.getLogin().equals(login));
+    }
+
+    public Optional<User> findByLoginAndPassword(String login, String password) {
+        return findAll()
+                .stream()
+                .filter(user -> user.getLogin().equals(login)
+                        && user.getPassword().equals(password))
+                .findFirst();
     }
 
     public void updateUserNickname(User user) {

@@ -1,28 +1,16 @@
 package ru.geekbrains.lesson2.server;
 
-import ru.geekbrains.lesson2.server.service.AuthService;
-import ru.geekbrains.lesson2.server.service.ChatUsersRepository;
-import ru.geekbrains.lesson2.server.service.RegistrationService;
+import ru.geekbrains.lesson2.server.service.UserService;
 
 public class MessageTransmitter {
-    private final RegistrationService registrationService;
-    private final AuthService authService;
+    private final UserService userService;
     private final Router router;
     private final Sender sender;
 
-    public MessageTransmitter(ChatUsersRepository repository) {
-        registrationService = new RegistrationService(repository);
-        authService = new AuthService(repository);
+    public MessageTransmitter(UserService userService) {
+        this.userService = userService;
         this.sender = new ServerSender();
-        this.router = new ServerRouter(authService, sender);
-    }
-
-    public AuthService getAuthService() {
-        return authService;
-    }
-
-    public RegistrationService getRegistrationService() {
-        return registrationService;
+        this.router = new ServerRouter(sender, userService);
     }
 
     public void unicast(ClientHandler clientHandler, String nickname, String formedMessage) {
@@ -39,5 +27,9 @@ public class MessageTransmitter {
 
     public void sendStatusMessage(ClientHandler clientHandler, String currentUserNotLoggedOn) {
         sender.sendStatusMessage(clientHandler, currentUserNotLoggedOn);
+    }
+
+    public UserService getUserService() {
+        return userService;
     }
 }

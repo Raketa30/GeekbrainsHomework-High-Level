@@ -9,8 +9,7 @@ public class ServerSender implements Sender {
     public void sendMessage(ClientHandler clientHandler, String nickname, String message) {
         if (clientHandler.getUser() != null) {
             try {
-                clientHandler.getOut()
-                        .writeUTF(String.format("[%s]:> %s", nickname, message));
+                clientHandler.sendData(String.format("[%s]:> %s", nickname, message));
 
             } catch (IOException e) {
                 throw new ChatServerException("Something went wrong during sending the message.", e);
@@ -21,7 +20,7 @@ public class ServerSender implements Sender {
     @Override
     public void sendStatusMessage(ClientHandler clientHandler, String message) {
         try {
-            clientHandler.getOut().writeUTF(message);
+            clientHandler.sendData(message);
         } catch (IOException e) {
             throw new ChatServerException("Something went wrong during sending the status message.", e);
         }
@@ -30,7 +29,7 @@ public class ServerSender implements Sender {
     @Override
     public void sendPersonalMessage(ClientHandler clientHandler, String nickname, String message) {
         try {
-            clientHandler.getOut().writeUTF(String.format("[Private]%s:> %s", nickname, message));
+            clientHandler.sendData(String.format("[Private]%s:> %s", nickname, message));
         } catch (IOException e) {
             throw new ChatServerException("Something went wrong during sending the private message.", e);
         }
