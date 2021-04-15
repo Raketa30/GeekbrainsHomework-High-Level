@@ -2,10 +2,7 @@ package ru.geekbrains.lesson2.server.service;
 
 import ru.geekbrains.lesson2.server.entity.User;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +19,6 @@ public class ChatUserRepo {
                 User user = new User(resultSet.getString("nickname"),
                         resultSet.getString("login"),
                         resultSet.getString("password"));
-                user.setId(resultSet.getInt("user_id"));
                 users.add(user);
             }
 
@@ -34,16 +30,44 @@ public class ChatUserRepo {
     }
 
     public boolean findUserByLogin(String login) {
-        return findAll().stream()
-                .anyMatch(user -> user.getLogin().equals(login));
+        try {
+            Connection connection = DBConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE login = ?");
+            statement.setString(1, login);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                return true;
+            }
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return false;
     }
 
     public Optional<User> findByLoginAndPassword(String login, String password) {
-        return findAll()
-                .stream()
-                .filter(user -> user.getLogin().equals(login)
-                        && user.getPassword().equals(password))
-                .findFirst();
+        try {
+            Connection connection = DBConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE login = ? AND password = ?");
+            statement.setString(1, login);
+            statement.setString(2, password);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                User user = new User(resultSet.getString("nickname"),
+                        resultSet.getString("login"),
+                        resultSet.getString("password"));
+                return Optional.of(user);
+            }
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return Optional.empty();
     }
 
     public void updateUserNickname(User user) {

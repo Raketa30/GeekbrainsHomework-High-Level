@@ -3,7 +3,6 @@ package ru.geekbrains.lesson2.server.entity;
 import java.util.Objects;
 
 public class User {
-    private int id;
     private String nickname;
     private final String login;
     private String password;
@@ -45,14 +44,6 @@ public class User {
                 password.equals(user.password);
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(nickname, login, password);
@@ -61,8 +52,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
-                ", nickname='" + nickname + '\'' +
+                "nickname='" + nickname + '\'' +
                 ", login='" + login + '\'' +
                 ", password='" + password + '\'' +
                 '}';
