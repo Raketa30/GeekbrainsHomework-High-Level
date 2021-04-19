@@ -63,7 +63,6 @@ public class MessageProcessor {
             transmitter.sendStatusMessage(clientHandler, "Successfully registered, please auth");
             return;
         }
-
         transmitter.sendStatusMessage(clientHandler, "Try again");
     }
 
@@ -80,7 +79,7 @@ public class MessageProcessor {
 
                 service.subscribe(clientHandler);
 
-                transmitter.sendStatusMessage(clientHandler, "Connected to main chat");
+                transmitter.sendStatusMessage(clientHandler, "-?logged " + currentUser.get().getNickname());
                 transmitter.sendStatusMessage(clientHandler, "For change nickname enter: /change new_nickname");
                 return true;
 
@@ -107,9 +106,7 @@ public class MessageProcessor {
         if (checkUser(message)) {
             String nickname = takeUserNicknameFromMessage(message);
             String formedMessage = formPersonalMessage(message);
-
             transmitter.unicast(clientHandler, nickname, formedMessage);
-
         } else {
             transmitter.sendStatusMessage(clientHandler, "Current user not logged on");
         }

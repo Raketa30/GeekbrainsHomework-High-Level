@@ -1,7 +1,6 @@
 package ru.geekbrains.lesson2_3.server;
 
 import ru.geekbrains.lesson2_3.server.entity.User;
-import ru.geekbrains.lesson2_3.server.exceptions.ChatServerException;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -10,28 +9,15 @@ import java.net.Socket;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * 1. Разобраться с кодом
- * 2. * Реализовать личные сообщения, если клиент пишет «/w nick3 Привет»,
- * то только клиенту с ником nick3 должно прийти сообщение «Привет»
- */
-
 public class ClientHandler implements Runnable {
-    private final DataOutputStream out;
-    private final DataInputStream in;
     private final SocketReceiver receiver;
+    private final Socket socket;
     private User user;
 
     public ClientHandler(Socket socket, MessageTransmitter messageTransmitter) {
-        try {
-            in = new DataInputStream(socket.getInputStream());
-            out = new DataOutputStream(socket.getOutputStream());
-            receiver = new SocketReceiver(messageTransmitter, this);
-            getAuthTimer(socket);
-
-        } catch (IOException e) {
-            throw new ChatServerException("ClientHandler closed");
-        }
+        this.socket = socket;
+        receiver = new SocketReceiver(messageTransmitter, this);
+        getAuthTimer(socket);
     }
 
     @Override
@@ -40,11 +26,17 @@ public class ClientHandler implements Runnable {
     }
 
     public String readData() throws IOException {
-        return in.readUTF();
+        String message;
+        try (DataInputStream in = new DataInputStream(socket.getInputStream())) {
+            message = in.readUTF();
+        }
+        return message;
     }
 
     public void sendData(String data) throws IOException {
-        out.writeUTF(data);
+        try (DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+            out.writeUTF(data);
+        }
     }
 
     private void getAuthTimer(Socket socket) {
@@ -54,6 +46,7 @@ public class ClientHandler implements Runnable {
             public void run() {
                 if (user == null) {
                     try {
+                        sendData("Auth timeout");
                         socket.close();
                     } catch (IOException e) {
                         e.printStackTrace();

@@ -16,11 +16,15 @@ public class ChatFrame extends JFrame {
         setLayout(new BorderLayout());
 
         JTextArea chatArea = new JTextArea();
+        JScrollPane scrollPane = new JScrollPane(chatArea,
+                ScrollPaneLayout.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneLayout.HORIZONTAL_SCROLLBAR_NEVER);
+
         textPanel = new InputTextPanel(chatArea, sender);
 
         chatArea.setEditable(false);
 
-        add(chatArea, BorderLayout.CENTER);
+        add(scrollPane, BorderLayout.CENTER);
         add(textPanel, BorderLayout.SOUTH);
 
         setVisible(true);

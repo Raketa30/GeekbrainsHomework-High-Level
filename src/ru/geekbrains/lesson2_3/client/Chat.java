@@ -21,8 +21,6 @@ public class Chat {
                 }
             }
         }).start();
-        //
-
     }
 
 
