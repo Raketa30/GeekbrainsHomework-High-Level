@@ -40,18 +40,18 @@ public class MessageProcessor {
             boolean access = false;
             while (!access) {
                 String request = clientHandler.readData();
+                if (request != null) {
+                    if (checkCredentials(request)) {
+                        if (request.startsWith("-auth")) {
+                            access = processAuthentication(request);
 
-                if (checkCredentials(request)) {
-                    if (request.startsWith("-auth")) {
-                        access = processAuthentication(request);
-
-                    } else if (request.startsWith("-register")) {
-                        processRegistration(request);
+                        } else if (request.startsWith("-register")) {
+                            processRegistration(request);
+                        }
+                    } else {
+                        transmitter.sendStatusMessage(clientHandler, "Incorrect authentication request");
                     }
-                } else {
-                    transmitter.sendStatusMessage(clientHandler, "Incorrect authentication request");
                 }
-
             }
         } catch (IOException e) {
             throw new ChatServerException("Something went wrong in auth process", e);
