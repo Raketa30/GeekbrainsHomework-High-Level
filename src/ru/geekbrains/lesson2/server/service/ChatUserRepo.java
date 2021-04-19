@@ -21,6 +21,7 @@ public class ChatUserRepo {
                         resultSet.getString("password"));
                 users.add(user);
             }
+            connection.close();
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -39,7 +40,7 @@ public class ChatUserRepo {
             if (resultSet.next()) {
                 return true;
             }
-
+            connection.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -60,41 +61,59 @@ public class ChatUserRepo {
                 User user = new User(resultSet.getString("nickname"),
                         resultSet.getString("login"),
                         resultSet.getString("password"));
+                connection.close();
                 return Optional.of(user);
             }
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-
         return Optional.empty();
     }
 
     public void updateUserNickname(User user) {
+        Connection connection = null;
         try {
-            Connection connection = DBConnection.getConnection();
+            connection = DBConnection.getConnection();
             Statement statement = connection.createStatement();
             String query = String.format("UPDATE users SET nickname = '%s' WHERE login = '%s'", user.getNickname(), user.getLogin());
             statement.execute(query);
+            connection.commit();
             connection.close();
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+            try {
+                if (connection != null) {
+                    connection.rollback();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void registerUser(User user) {
+        Connection connection = null;
         try {
-            Connection connection = DBConnection.getConnection();
+            connection = DBConnection.getConnection();
             Statement statement = connection.createStatement();
             if (!findAll().contains(user)) {
                 String query = String.format("INSERT INTO users(nickname, login, password) VALUES('%s', '%s', '%s');", user.getNickname(), user.getLogin(), user.getPassword());
                 statement.execute(query);
             }
+            connection.commit();
             connection.close();
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+            try {
+                if (connection != null) {
+                    connection.rollback();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
