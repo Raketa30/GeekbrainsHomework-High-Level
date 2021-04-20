@@ -1,5 +1,6 @@
-package ru.geekbrains.chat_app.server;
+package ru.geekbrains.chat_app.server.transmitter;
 
+import ru.geekbrains.chat_app.server.ClientHandler;
 import ru.geekbrains.chat_app.server.exceptions.ChatServerException;
 
 import java.io.IOException;
@@ -7,14 +8,13 @@ import java.io.IOException;
 public class ServerSender implements Sender<String> {
     @Override
     public void sendMessage(ClientHandler clientHandler, String nickname, String message) {
-        if (clientHandler.getUser() != null) {
-            try {
-                clientHandler.sendData(String.format("[%s]:> %s", nickname, message));
+        try {
+            clientHandler.sendData(String.format("[%s]:> %s", nickname, message));
 
-            } catch (IOException e) {
-                throw new ChatServerException("Something went wrong during sending the message.", e);
-            }
+        } catch (IOException e) {
+            throw new ChatServerException("Something went wrong during sending the message.", e);
         }
+
     }
 
     @Override

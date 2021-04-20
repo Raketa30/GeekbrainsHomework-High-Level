@@ -1,26 +1,26 @@
 package ru.geekbrains.chat_app.server;
 
-import ru.geekbrains.chat_app.server.entity.Message;
-import ru.geekbrains.chat_app.server.entity.User;
 import ru.geekbrains.chat_app.server.exceptions.ChatServerException;
+import ru.geekbrains.chat_app.server.transmitter.MessageTransmitter;
+import ru.geekbrains.chat_app.server.transmitter.SocketReceiver;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ClientHandler implements Runnable {
     private final DataOutputStream out;
     private final DataInputStream in;
     private final SocketReceiver receiver;
-    private User user;
+    private final Socket socket;
 
     public ClientHandler(Socket socket, MessageTransmitter messageTransmitter) {
+        this.socket = socket;
         try {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
             receiver = new SocketReceiver(messageTransmitter, this);
-            getAuthTimer(socket);
 
         } catch (IOException e) {
             throw new ChatServerException("ClientHandler closed", e);
@@ -40,27 +40,13 @@ public class ClientHandler implements Runnable {
         out.writeUTF(data);
     }
 
-    private void getAuthTimer(Socket socket) {
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (user == null) {
-                    try {
-                        socket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }, 120000);
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public User getUser() {
-        return user;
+    public void shutdown() {
+        try {
+            in.close();
+            out.close();
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

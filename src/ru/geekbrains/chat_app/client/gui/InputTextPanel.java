@@ -35,6 +35,7 @@ public class InputTextPanel extends JPanel {
         button.addActionListener(e -> {
             if (!textField.getText().equals("")) {
                 String message = textField.getText();
+
                 if (logged) {
                     String messageToChat = transformMessage(message);
                     chatArea.append(messageToChat + "\n");

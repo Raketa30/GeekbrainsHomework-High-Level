@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ChatUserRepo {
+public class ChatUserRepo implements UserRepo{
+
+    @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
         try {
@@ -29,7 +31,7 @@ public class ChatUserRepo {
 
         return users;
     }
-
+    @Override
     public boolean findUserByLogin(String login) {
         try {
             Connection connection = DBConnection.getConnection();
@@ -47,8 +49,8 @@ public class ChatUserRepo {
 
         return false;
     }
-
-    public Optional<User> findByLoginAndPassword(String login, String password) {
+    @Override
+    public Optional<User> findUserByLoginAndPassword(String login, String password) {
         try {
             Connection connection = DBConnection.getConnection();
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE login = ? AND password = ?");
@@ -58,20 +60,23 @@ public class ChatUserRepo {
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
-                User user = new User(resultSet.getString("nickname"),
+                User user = new User(
+                        resultSet.getString("nickname"),
                         resultSet.getString("login"),
-                        resultSet.getString("password"));
-                connection.close();
+                        resultSet.getString("password")
+                );
+
                 return Optional.of(user);
             }
+            connection.close();
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
         return Optional.empty();
     }
-
-    public void updateUserNickname(User user) {
+    @Override
+    public void updateUser(User user) {
         Connection connection = null;
         try {
             connection = DBConnection.getConnection();
@@ -92,7 +97,7 @@ public class ChatUserRepo {
             }
         }
     }
-
+    @Override
     public void registerUser(User user) {
         Connection connection = null;
         try {
@@ -101,9 +106,9 @@ public class ChatUserRepo {
             if (!findAll().contains(user)) {
                 String query = String.format("INSERT INTO users(nickname, login, password) VALUES('%s', '%s', '%s');", user.getNickname(), user.getLogin(), user.getPassword());
                 statement.execute(query);
+                connection.commit();
+                connection.close();
             }
-            connection.commit();
-            connection.close();
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();

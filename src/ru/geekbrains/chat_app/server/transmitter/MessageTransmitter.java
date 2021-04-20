@@ -1,16 +1,17 @@
-package ru.geekbrains.chat_app.server;
+package ru.geekbrains.chat_app.server.transmitter;
 
-import ru.geekbrains.chat_app.server.service.UserService;
+import ru.geekbrains.chat_app.server.ClientHandler;
+import ru.geekbrains.chat_app.server.service.ChatUserService;
 
 public class MessageTransmitter {
-    private final UserService userService;
+    private final ChatUserService chatUserService;
     private final Router<String> router;
     private final Sender<String> sender;
 
-    public MessageTransmitter(UserService userService) {
-        this.userService = userService;
+    public MessageTransmitter(ChatUserService chatUserService) {
+        this.chatUserService = chatUserService;
         this.sender = new ServerSender();
-        this.router = new ServerRouter(sender, userService);
+        this.router = new ServerRouter(sender, chatUserService);
     }
 
     public void unicast(ClientHandler clientHandler, String nickname, String formedMessage) {
@@ -29,7 +30,7 @@ public class MessageTransmitter {
         sender.sendStatusMessage(clientHandler, currentUserNotLoggedOn);
     }
 
-    public UserService getUserService() {
-        return userService;
+    public ChatUserService getChatUserService() {
+        return chatUserService;
     }
 }
