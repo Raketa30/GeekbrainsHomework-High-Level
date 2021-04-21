@@ -112,7 +112,6 @@ public class MessageProcessor {
 
                 transmitter.broadcast(String.format("User %s, logged in", currentUser.get().getNickname()));
                 transmitter.sendStatusMessage(clientHandler, "-?logged " + currentUser.get().getNickname());
-                transmitter.sendStatusMessage(clientHandler, "For change nickname enter: /change new_nickname");
 
                 chatUserService.logIn(clientHandler, currentUser.get());
                 return currentUser;

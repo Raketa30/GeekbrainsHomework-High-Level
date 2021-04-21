@@ -10,11 +10,9 @@ public class ServerSender implements Sender<String> {
     public void sendMessage(ClientHandler clientHandler, String nickname, String message) {
         try {
             clientHandler.sendData(String.format("[%s]:> %s", nickname, message));
-
         } catch (IOException e) {
             throw new ChatServerException("Something went wrong during sending the message.", e);
         }
-
     }
 
     @Override

@@ -13,7 +13,8 @@ public class Chat {
         frame = new ChatFrame(communication::send);
 
         new Thread(() -> {
-            Receiver<String> receiver = frame.getTextPanel().getReceiver();
+            Receiver<String> receiver = frame.getTextPanel().getMessageAction().getReceiver();
+
             while (true) {
                 String msg = communication.receive();
                 if (!msg.isBlank()) {
